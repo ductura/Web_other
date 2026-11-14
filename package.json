@@ -1,0 +1,17 @@
+{
+  "name": "@ductura/web-other",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Ductura frontend za Firefox, Safari, Edge, Operu i ostale preglednike na računalu",
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "dev": "node dev-server.mjs",
+    "test": "npm run test:helpers && npm run test:functional",
+    "test:helpers": "node --test \"test/unit/*.test.js\"",
+    "test:functional": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
+  }
+}
