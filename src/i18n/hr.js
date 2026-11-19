@@ -9,6 +9,7 @@ export const hr = {
   dokument: {
     naslov: "Naslov",
     sadrzaj: "Sadržaj",
+    spremi: "Spremi",
     rijeci: (n) => `${n} riječi`,
     nedostupan: "Dokument nije dostupan.",
     natrag: "Natrag na popis",

@@ -5,13 +5,14 @@ Frontend za Firefox, Safari, Edge, Operu i ostale preglednike na računalu. Next
 ## Podaci
 
 - Aplikacija se poslužuje pod `/o` (`basePath`, D-306 t. 1).
-- Podatke čita samo preko Institution_servera `/api/v1`, na poslužitelju (stranice i `app/api/`), na adresi iz `INSTITUTION_SERVER_URL` (zadano http://127.0.0.1:4000). Preglednik ga ne zove za podatke, a baza se nikad ne čita izravno.
+- Podatke čita i sprema samo preko Institution_servera `/api/v1`, na poslužitelju (stranice i `app/api/`), na adresi iz `INSTITUTION_SERVER_URL` (zadano http://127.0.0.1:4000). Preglednik ga ne zove za podatke, a baza se nikad ne čita izravno.
 - Prenosi se samo kolačić sesije `__Host-ductus_session`. Bez sesije preglednik ide na `/api/v1/auth/login?returnTo=...` (prijava samo preko AAI@EduHr, D-09).
 
 | Stranica | Što radi | Institution_server |
 | --- | --- | --- |
 | `/o/` | Moji dokumenti | `GET /api/v1/documents` |
-| `/o/doc/[id]` | naslov, sadržaj, broj riječi | `GET /api/v1/documents/{id}` |
+| `/o/doc/[id]` | naslov, sadržaj, broj riječi, spremanje | `GET /api/v1/documents/{id}` |
+| `PUT /o/api/dokumenti/[id]` | spremanje iz uređivača | `PUT /api/v1/documents/{id}` |
 
 Stare poveznice `/#/doc/<id>` otvaraju isti dokument.
 
@@ -27,7 +28,7 @@ Opera nema vlastiti Playwright kanal; dijeli Chromium jezgru, a ručno se provje
 pnpm install
 LAZNI_PORT=4000 pnpm fake-server   # bez pravog Institution_servera
 pnpm dev                           # http://localhost:5173/o
-pnpm test                          # vitest: pomoćne funkcije i stranice
+pnpm test                          # vitest: pomoćne funkcije, stranice, ruta spremanja
 pnpm build
 pnpm exec playwright install firefox webkit chromium
 pnpm test:functional
