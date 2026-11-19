@@ -8,10 +8,11 @@ const ID = /^[\w-]{1,128}$/;
 export async function PUT(request, { params }) {
   const { id } = await params;
   if (!ID.test(id)) return odgovor({ greska: "nema" }, 404);
-  const m = await procitajMutaciju(request);
-  if (m.odbijeno) return m.odbijeno;
+  // Without a session the body is never read.
   const kolacic = izvuciKolacic(request.headers.get("cookie"));
   if (!kolacic) return odgovor({ greska: "nije_prijavljen" }, 401);
+  const m = await procitajMutaciju(request);
+  if (m.odbijeno) return m.odbijeno;
 
   const t = m.tijelo && typeof m.tijelo === "object" ? m.tijelo : {};
   if (typeof t.title !== "string" || typeof t.content !== "string") return odgovor({ greska: "neispravan_unos" }, 400);

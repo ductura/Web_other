@@ -125,6 +125,27 @@ describe("PUT /o/api/dokumenti/[id]", () => {
     expect(pozivi).toEqual([]);
   });
 
+  it("prevelik zahtjev odbija čim prijeđe 1 MB, bez čitanja ostatka", async () => {
+    let procitano = 0;
+    const tok = new ReadableStream({
+      pull(c) {
+        if (procitano >= 16) return c.close();
+        procitano += 1;
+        c.enqueue(new Uint8Array(1024 * 1024));
+      },
+    });
+    const req = new Request("http://localhost/o/api/dokumenti/demo-1", {
+      method: "PUT",
+      headers: { "content-type": "application/json", cookie: "__Host-ductus_session=s1" },
+      body: tok,
+      duplex: "half",
+    });
+    expect((await dokument.PUT(req, { params: Promise.resolve({ id: "demo-1" }) })).status).toBe(413);
+    expect(procitano).toBeLessThan(4);
+    expect((await put("demo-1", "x".repeat(1024 * 1024 + 1))).status).toBe(413);
+    expect(pozivi).toEqual([]);
+  });
+
   it("odgovori servera: 401, 404, greška i nedostupnost", async () => {
     for (const [s, ocekivano] of [[401, 401], [404, 404], [500, 502]]) {
       odgovor = Response.json({}, { status: s });
