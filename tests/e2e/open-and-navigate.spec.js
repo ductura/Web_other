@@ -37,9 +37,11 @@ test("dokument se otvara, navigacija radi i nakon osvježavanja", async ({ page 
 });
 
 test("stara poveznica #/doc/<id> otvara isti dokument", async ({ page }) => {
-  await page.goto("/o/#/doc/demo-1");
-  await expect(page).toHaveURL(/\/o\/doc\/demo-1$/);
-  await expect(page.getByLabel("Naslov")).toHaveValue("Seminarski rad");
+  for (const stara of ["/#/doc/demo-1", "/o/#/doc/demo-1"]) {
+    await page.goto(stara);
+    await expect(page).toHaveURL(/\/o\/doc\/demo-1$/);
+    await expect(page.getByLabel("Naslov")).toHaveValue("Seminarski rad");
+  }
 });
 
 test("izmjena se sprema na poslužitelj i ostaje nakon osvježavanja", async ({ page }, info) => {
