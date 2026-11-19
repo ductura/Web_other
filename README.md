@@ -18,7 +18,7 @@ Stare poveznice `/#/doc/<id>` otvaraju isti dokument.
 ## Funkcionalna provjera
 
 Isti dokument otvara se u svakom od tih preglednika, a navigacija radi i nakon osvježavanja.
-Pokriva je `tests/e2e/open-and-navigate.spec.js` u Firefoxu, Safariju (WebKit), Edgeu i Chromiumu, nad produkcijskim buildom i lažnim Institution_serverom (`tests/e2e/lazni-server.mjs`, samo izmišljeni podaci).
+Pokriva je `tests/e2e/open-and-navigate.spec.js` u Firefoxu, Safariju (WebKit), Edgeu i Chromiumu, nad produkcijskim buildom i lažnim Institution_serverom (`tests/e2e/lazni-server.mjs`, samo izmišljeni podaci). Preglednici idu preko https (`tests/e2e/https-proxy.mjs`, certifikat se stvara pri pokretanju s `openssl`), jer WebKit kolačić sesije `Secure` šalje samo preko https.
 Opera nema vlastiti Playwright kanal; dijeli Chromium jezgru, a ručno se provjerava prije izdanja.
 
 ## Pokretanje
