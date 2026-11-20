@@ -35,8 +35,16 @@ const server = createServer(async (req, res) => {
   if (req.method === "PUT") {
     let raw = "";
     for await (const c of req) raw += c;
-    const body = JSON.parse(raw || "{}");
-    docs.set(doc.id, { ...doc, title: body.title ?? doc.title, content: body.content ?? doc.content });
+    let body;
+    try {
+      body = JSON.parse(raw);
+    } catch {
+      return json(res, 400, { error: "invalid_json" });
+    }
+    if (body?.id !== doc.id || typeof body.title !== "string" || typeof body.content !== "string") {
+      return json(res, 400, { error: "invalid_document" });
+    }
+    docs.set(doc.id, { id: doc.id, title: body.title, content: body.content });
   } else if (req.method !== "GET") return json(res, 405, { error: "method_not_allowed" });
   return json(res, 200, docs.get(doc.id));
 });

@@ -72,6 +72,15 @@ describe("stranice", () => {
     expect(await html(DocPage({ params: Promise.resolve({ id: "nema" }) }))).toContain(hr.dokument.nedostupan);
   });
 
+  it("ne nudi uređivanje kad poslužitelj ne vrati sadržaj traženog dokumenta", async () => {
+    for (const zapis of [{ id: "demo-1", title: "Bez sadržaja" }, DOCS[1]]) {
+      odgovor = Response.json(zapis);
+      const h = await html(DocPage({ params: Promise.resolve({ id: "demo-1" }) }));
+      expect(h).toContain(hr.greske.nedostupan);
+      expect(h).not.toContain("<textarea");
+    }
+  });
+
   it("bez sesije ili uz 401 ide na prijavu; nedostupan server daje poruku", async () => {
     kolacic.value = null;
     expect(await redirectNa(Page())).toBe("/prijava");
@@ -148,7 +157,7 @@ describe("PUT /o/api/dokumenti/[id]", () => {
   });
 
   it("odgovori servera: 401, 404, greška i nedostupnost", async () => {
-    for (const [s, ocekivano] of [[401, 401], [404, 404], [500, 502]]) {
+    for (const [s, ocekivano] of [[202, 502], [401, 401], [403, 404], [404, 404], [500, 502]]) {
       odgovor = Response.json({}, { status: s });
       expect((await put("demo-1", { title: "N", content: "S" })).status).toBe(ocekivano);
     }
