@@ -7,14 +7,15 @@ export function debounce(fn, ms) {
   return wrapped;
 }
 
-/** '#/doc/abc' -> { view: 'doc', id: 'abc' }; sve ostalo -> popis */
+/** Stara poveznica '#/doc/abc' -> { view: 'doc', id: 'abc' }; sve ostalo -> popis */
 export function parseRoute(hash = '') {
   const m = String(hash).match(/^#\/doc\/([\w-]+)$/);
   return m ? { view: 'doc', id: m[1] } : { view: 'list' };
 }
 
+/** Putanja dokumenta u aplikaciji (Next dodaje basePath). */
 export function docHref(id) {
-  return `#/doc/${encodeURIComponent(id)}`;
+  return `/doc/${encodeURIComponent(id)}`;
 }
 
 export function wordCount(text = '') {
@@ -22,7 +23,7 @@ export function wordCount(text = '') {
   return words.length;
 }
 
-const LABELS = { idle: '', dirty: 'Nespremljene izmjene', saving: 'Spremanje…', saved: 'Spremljeno', error: 'Greška pri spremanju' };
+const LABELS = { idle: '', dirty: 'Nespremljene izmjene', saving: 'Spremanje…', saved: 'Spremljeno na poslužitelju', error: 'Greška pri spremanju' };
 export function saveStatusLabel(state) {
   return LABELS[state] ?? '';
 }
