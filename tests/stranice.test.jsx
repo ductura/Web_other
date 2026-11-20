@@ -4,6 +4,7 @@ import RootLayout, { metadata } from "../app/layout.jsx";
 import DocPage from "../app/doc/[id]/page.jsx";
 import Page from "../app/page.jsx";
 import * as prijava from "../app/prijava/route.js";
+import * as dokument from "../app/api/dokumenti/[id]/route.js";
 import { hr } from "../src/i18n/hr.js";
 
 const kolacic = { value: "sesija-test" };
@@ -61,11 +62,12 @@ describe("stranice", () => {
     expect(pozivi[0].headers.cookie).toBe("__Host-ductus_session=sesija-test");
   });
 
-  it("dokument ima naslov, sadržaj i broj riječi", async () => {
+  it("dokument ima naslov, sadržaj, broj riječi i gumb Spremi", async () => {
     const h = await html(DocPage({ params: Promise.resolve({ id: "demo-1" }) }));
     expect(h).toContain('value="Seminarski rad"');
     expect(h).toContain("Uvod u temu.");
     expect(h).toContain("3 riječi");
+    expect(h).toContain(hr.dokument.spremi);
     expect(await html(DocPage({ params: Promise.resolve({ id: "nema" }) }))).toContain(hr.dokument.nedostupan);
   });
 
@@ -89,5 +91,67 @@ describe("GET /o/prijava", () => {
     for (const zlo of ["//zlo.test", "/\\zlo.test", "https://zlo.test", "/../admin"]) {
       expect(cilj(`?povratak=${encodeURIComponent(zlo)}`)).toBe("/api/v1/auth/login?returnTo=%2Fo%2F");
     }
+  });
+});
+
+describe("PUT /o/api/dokumenti/[id]", () => {
+  const put = (id, tijelo, zaglavlja = {}) =>
+    dokument.PUT(
+      new Request(`http://localhost/o/api/dokumenti/${id}`, {
+        method: "PUT",
+        headers: { "content-type": "application/json", "sec-fetch-site": "same-origin", cookie: "x=1; __Host-ductus_session=s1", ...zaglavlja },
+        body: typeof tijelo === "string" ? tijelo : JSON.stringify(tijelo),
+      }),
+      { params: Promise.resolve({ id }) },
+    );
+
+  it("prosljeđuje samo naslov i sadržaj, sa sesijom", async () => {
+    const res = await put("demo-1", { title: "N", content: "S", visak: 1 });
+    expect(res.status).toBe(204);
+    expect(pozivi[0].url).toBe("http://server.test:4000/api/v1/documents/demo-1");
+    expect(pozivi[0].method).toBe("PUT");
+    expect(JSON.parse(pozivi[0].body)).toEqual({ id: "demo-1", title: "N", content: "S" });
+    expect(pozivi[0].headers.cookie).toBe("__Host-ductus_session=s1");
+  });
+
+  it("odbija bez poziva servera: tuđe podrijetlo, ne-JSON, bez sesije, krivi unos", async () => {
+    expect((await put("demo-1", { title: "N", content: "S" }, { "sec-fetch-site": "cross-site" })).status).toBe(403);
+    expect((await put("demo-1", { title: "N", content: "S" }, { "content-type": "text/plain" })).status).toBe(415);
+    expect((await put("demo-1", { title: "N", content: "S" }, { cookie: "" })).status).toBe(401);
+    expect((await put("demo-1", "{")).status).toBe(400);
+    expect((await put("demo-1", { title: 1, content: "S" })).status).toBe(400);
+    expect((await put("a%2Fb", { title: "N", content: "S" })).status).toBe(404);
+    expect(dokument.GET().status).toBe(405);
+    expect(pozivi).toEqual([]);
+  });
+
+  it("prevelik zahtjev odbija čim prijeđe 1 MB, bez čitanja ostatka", async () => {
+    let procitano = 0;
+    const tok = new ReadableStream({
+      pull(c) {
+        if (procitano >= 16) return c.close();
+        procitano += 1;
+        c.enqueue(new Uint8Array(1024 * 1024));
+      },
+    });
+    const req = new Request("http://localhost/o/api/dokumenti/demo-1", {
+      method: "PUT",
+      headers: { "content-type": "application/json", cookie: "__Host-ductus_session=s1" },
+      body: tok,
+      duplex: "half",
+    });
+    expect((await dokument.PUT(req, { params: Promise.resolve({ id: "demo-1" }) })).status).toBe(413);
+    expect(procitano).toBeLessThan(4);
+    expect((await put("demo-1", "x".repeat(1024 * 1024 + 1))).status).toBe(413);
+    expect(pozivi).toEqual([]);
+  });
+
+  it("odgovori servera: 401, 404, greška i nedostupnost", async () => {
+    for (const [s, ocekivano] of [[401, 401], [404, 404], [500, 502]]) {
+      odgovor = Response.json({}, { status: s });
+      expect((await put("demo-1", { title: "N", content: "S" })).status).toBe(ocekivano);
+    }
+    odgovor = new TypeError("fetch failed");
+    expect((await put("demo-1", { title: "N", content: "S" })).status).toBe(502);
   });
 });

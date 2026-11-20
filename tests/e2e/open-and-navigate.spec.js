@@ -44,6 +44,16 @@ test("stara poveznica #/doc/<id> otvara isti dokument", async ({ page }) => {
   }
 });
 
+test("izmjena se sprema na poslužitelj i ostaje nakon osvježavanja", async ({ page }, info) => {
+  const tekst = `Bilješka iz preglednika ${info.project.name}`;
+  await page.goto("/o/doc/demo-2");
+  await page.getByLabel("Sadržaj").fill(tekst);
+  await expect(page.getByText("4 riječi")).toBeVisible();
+  await expect(page.getByRole("status")).toHaveText("Spremljeno na poslužitelju");
+  await page.reload();
+  await expect(page.getByLabel("Sadržaj")).toHaveValue(tekst);
+});
+
 base("bez sesije preglednik ide na prijavu preko Institution_servera", async ({ page }) => {
   await page.goto("/o/doc/demo-1");
   await expect(page).toHaveURL(/\/api\/v1\/auth\/login\?returnTo=%2Fo%2Fdoc%2Fdemo-1$/);
