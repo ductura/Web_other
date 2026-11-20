@@ -21,6 +21,8 @@ test("dokument se otvara, navigacija radi i nakon osvježavanja", async ({ page 
   await page.getByRole("link", { name: "Seminarski rad" }).click();
   await expect(page).toHaveURL(/\/o\/doc\/demo-1$/);
   await expect(page.getByLabel("Naslov")).toHaveValue("Seminarski rad");
+  await expect(page.getByLabel("Sadržaj")).toHaveValue("Uvod u temu.");
+  await expect(page.getByText("Za spremanje je potrebna internetska veza.", { exact: false })).toBeVisible();
 
   await page.reload();
   await expect(page.getByLabel("Naslov")).toHaveValue("Seminarski rad");

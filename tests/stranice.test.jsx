@@ -68,6 +68,7 @@ describe("stranice", () => {
     expect(h).toContain("Uvod u temu.");
     expect(h).toContain("3 riječi");
     expect(h).toContain(hr.dokument.spremi);
+    expect(h).toContain(hr.dokument.ogranicenja);
     expect(await html(DocPage({ params: Promise.resolve({ id: "nema" }) }))).toContain(hr.dokument.nedostupan);
   });
 
