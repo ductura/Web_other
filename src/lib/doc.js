@@ -1,4 +1,5 @@
-// Pomoćne funkcije editora. Čiste funkcije, rade i u pregledniku i u Node testovima.
+// Pomoćne funkcije editora. Rade i u pregledniku i u Node testovima.
+import { hr } from '../i18n/hr.js';
 
 export function debounce(fn, ms) {
   let t;
@@ -23,9 +24,9 @@ export function wordCount(text = '') {
   return words.length;
 }
 
-const LABELS = { idle: '', dirty: 'Nespremljene izmjene', saving: 'Spremanje…', saved: 'Spremljeno na poslužitelju', error: 'Greška pri spremanju' };
 export function saveStatusLabel(state) {
-  return LABELS[state] ?? '';
+  const labels = hr.dokument.spremanje;
+  return Object.hasOwn(labels, state) ? labels[state] : '';
 }
 
 /** Zaslonska tipkovnica je vjerojatno otvorena kad vidljivi dio padne ispod 75 % visine prozora. */

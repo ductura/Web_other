@@ -22,5 +22,10 @@ export default async function DocPage({ params }) {
       </>
     );
   }
-  return <Uredivac key={doc.id} doc={doc} />;
+  return (
+    <>
+      <p className="editor-notice">{hr.dokument.ogranicenja}</p>
+      <Uredivac key={doc.id} doc={doc} />
+    </>
+  );
 }

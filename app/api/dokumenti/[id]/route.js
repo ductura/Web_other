@@ -23,7 +23,7 @@ export async function PUT(request, { params }) {
     kolacic,
   });
   if (!res) return odgovor({ greska: "nedostupan" }, 502);
-  if (res.ok) return odgovor(null, 204);
+  if (res.status === 200 || res.status === 204) return odgovor(null, 204);
   if (res.status === 401) return odgovor({ greska: "nije_prijavljen" }, 401);
   if (res.status === 403 || res.status === 404) return odgovor({ greska: "nema" }, 404);
   return odgovor({ greska: "nedostupan" }, 502);

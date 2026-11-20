@@ -33,6 +33,6 @@ export async function dohvatiDokumente() {
 export async function dohvatiDokument(id) {
   const r = await citaj(`/documents/${encodeURIComponent(id)}`);
   if (typeof r === "string") return r;
-  if (!dokument(r)) return "nedostupan";
-  return { id: r.id, title: r.title, content: typeof r.content === "string" ? r.content : "" };
+  if (!dokument(r) || r.id !== id || typeof r.content !== "string") return "nedostupan";
+  return { id: r.id, title: r.title, content: r.content };
 }

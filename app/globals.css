@@ -3,6 +3,7 @@ body { margin: 0; font: 16px/1.5 system-ui, sans-serif; color: #1d1d1f; backgrou
 .bar { display: flex; justify-content: space-between; padding: 12px 16px; background: #fff; border-bottom: 1px solid #ddd; }
 .bar a { font-weight: 600; text-decoration: none; color: inherit; }
 main { max-width: 860px; margin: 0 auto; padding: 16px; }
+.editor-notice { margin: 0 0 20px; padding: 12px 16px; border-left: 3px solid #6a655b; background: #f1efe9; }
 #title { width: 100%; font-size: 1.5rem; border: 0; background: transparent; margin-bottom: 8px; }
 #editor { width: 100%; min-height: 60vh; padding: 12px; font: inherit; border: 1px solid #ddd; border-radius: 6px; }
 .editor-bar { position: sticky; bottom: 0; display: flex; gap: 12px; align-items: center; padding: 8px 0; background: #fafafa; }
