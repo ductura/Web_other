@@ -31,16 +31,16 @@ async function procitajDoGranice(request, max) {
 /**
  * Mutations come only from this app's own pages: JSON (so a cross-site form
  * cannot send one without a preflight) and, where the browser says so, from
- * the same origin.
+ * the same origin. `max` is the body limit in bytes (default 1 MiB).
  * @returns {Promise<{tijelo: unknown} | {odbijeno: Response}>}
  */
-export async function procitajMutaciju(request) {
+export async function procitajMutaciju(request, max = MAX_TIJELO) {
   const site = request.headers.get("sec-fetch-site");
   if (site && site !== "same-origin") return { odbijeno: odgovor({ greska: "zabranjeno" }, 403) };
   if (!/^application\/json\s*(;|$)/i.test(request.headers.get("content-type") ?? "")) {
     return { odbijeno: odgovor({ greska: "ocekuje_se_json" }, 415) };
   }
-  const tekst = await procitajDoGranice(request, MAX_TIJELO);
+  const tekst = await procitajDoGranice(request, max);
   if (tekst === null) return { odbijeno: odgovor({ greska: "prevelik_zahtjev" }, 413) };
   try {
     return { tijelo: JSON.parse(tekst) };

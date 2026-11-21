@@ -33,12 +33,14 @@ export const valjanKolacic = (v) => (typeof v === "string" && /^[!#-+\--:<-[\]-~
 
 /**
  * @param {string} putanja path under /api/v1, e.g. "/documents"
- * @param {{method?: string, tijelo?: unknown, kolacic?: string | null}} [opcije]
+ * @param {{method?: string, tijelo?: unknown, kolacic?: string | null, origin?: string | null}} [opcije]
+ *   `origin` is forwarded as the Origin header for routes that check it.
  * @returns {Promise<Response | null>} null when the server cannot be reached in time.
  */
-export async function pozoviServer(putanja, { method = "GET", tijelo, kolacic } = {}) {
+export async function pozoviServer(putanja, { method = "GET", tijelo, kolacic, origin } = {}) {
   const headers = { accept: "application/json" };
   if (kolacic) headers.cookie = `${KOLACIC}=${kolacic}`;
+  if (origin) headers.origin = origin;
   if (tijelo !== undefined) headers["content-type"] = "application/json";
   try {
     return await fetch(`${serverUrl()}/api/v1${putanja}`, {
