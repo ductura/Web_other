@@ -2,6 +2,7 @@
 // invented data, kept in memory. Answers /api/v1/documents like the in-memory
 // API of the earlier dev-server.mjs, and only with a session cookie "e2e-*".
 // Each session has its own copy, so browsers running in parallel do not meet.
+import { createHash } from "node:crypto";
 import { createServer } from "node:http";
 
 const PORT = Number(process.env.LAZNI_PORT ?? 4199);
@@ -50,6 +51,27 @@ function zadaci(res, s, put) {
   return json(res, 200, put === "popis" ? ZADACI_PUN : RAD_PUN);
 }
 
+// support.problem-report.post: needs a session and an Origin header, like the real
+// route. The reference is derived from the description, so a test can check that
+// exactly its text arrived. Session e2e-prijava-429-* gets "too many reports".
+async function prijavaProblema(req, res, s) {
+  if (req.method !== "POST") return json(res, 405, { error: "method_not_allowed" });
+  if (!req.headers.origin) return json(res, 403, { error: "origin_missing" });
+  if (s.startsWith("e2e-prijava-429-")) return json(res, 429, { error: "too_many_reports" });
+  let raw = "";
+  for await (const c of req) raw += c;
+  let b;
+  try {
+    b = JSON.parse(raw);
+  } catch {
+    return json(res, 400, { error: "invalid_json" });
+  }
+  if (typeof b?.description !== "string" || !b.description || b.appVersion === undefined || b.syncState !== null) {
+    return json(res, 422, { error: "invalid_input" });
+  }
+  return json(res, 201, { reference: `PR-${createHash("sha1").update(b.description).digest("hex").slice(0, 10).toUpperCase()}` });
+}
+
 const server = createServer(async (req, res) => {
   const url = new URL(req.url, "http://localhost");
   if (url.pathname === "/__zdravlje") return json(res, 200, { ok: true });
@@ -58,6 +80,7 @@ const server = createServer(async (req, res) => {
   if (!s) return json(res, 401, { error: "unauthenticated" });
   if (url.pathname === "/api/v1/student/assignments" && req.method === "GET") return zadaci(res, s, "popis");
   if (url.pathname === "/api/v1/student/assignment-work" && req.method === "GET") return zadaci(res, s, "rad");
+  if (url.pathname === "/api/v1/support/problem-report") return prijavaProblema(req, res, s);
   const docs = dokumenti(s);
   if (url.pathname === "/api/v1/documents" && req.method === "GET") return json(res, 200, [...docs.values()]);
   const m = url.pathname.match(/^\/api\/v1\/documents\/([\w-]+)$/);
