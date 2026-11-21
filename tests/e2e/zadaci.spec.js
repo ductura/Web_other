@@ -36,7 +36,7 @@ test.describe("poslužitelj nedostupan", () => {
   test.use({ scenarij: "503-" });
   test("daje poruku i nudi ponovni pokušaj", async ({ page }) => {
     await page.goto("/o/zadaci");
-    await expect(page.getByRole("alert")).toContainText("Poslužitelj trenutačno ne odgovara");
+    await expect(page.locator("main").getByRole("alert")).toContainText("Poslužitelj trenutačno ne odgovara");
     await expect(page.getByRole("link", { name: "Pokušaj ponovno" })).toBeVisible();
   });
 });
@@ -45,7 +45,7 @@ test.describe("račun bez pristupa", () => {
   test.use({ scenarij: "403-" });
   test("daje poruku o pristupu", async ({ page }) => {
     await page.goto("/o/zadaci");
-    await expect(page.getByRole("alert")).toContainText("nije dostupan ovom računu");
+    await expect(page.locator("main").getByRole("alert")).toContainText("nije dostupan ovom računu");
   });
 });
 
