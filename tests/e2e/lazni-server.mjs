@@ -21,12 +21,43 @@ const json = (res, status, body) => {
 };
 const sesija = (req) => /(?:^|;\s*)__Host-ductus_session=(e2e-[\w-]{1,64})(?:;|$)/.exec(req.headers.cookie ?? "")?.[1];
 
+// student.assignments.get and student.assignment-work.get; the scenario comes
+// from the session name: e2e-zadaci-prazno-*, -403-*, -503-*, else the full list.
+const KOLEGIJ = "3f0c1d52-8a6e-4c1b-9d5a-1b2c3d4e5f60";
+const ZADACI_PUN = {
+  courses: [
+    {
+      id: KOLEGIJ,
+      name: "Izmišljeni seminar iz ekologije grada",
+      assignments: [
+        { id: "a1111111-2222-4333-8444-555555555551", title: "Seminarski rad: kućno kompostiranje", dueAt: "2027-01-15T22:59:00.000Z", noticeFirst: true },
+        { id: "a1111111-2222-4333-8444-555555555552", title: "Esej: zeleni krovovi", dueAt: "2027-02-10T22:59:00.000Z", noticeFirst: false },
+      ],
+    },
+    { id: "3f0c1d52-8a6e-4c1b-9d5a-1b2c3d4e5f61", name: "Izmišljeni kolegij bez zadatka", assignments: [] },
+  ],
+};
+const RAD_PUN = {
+  assignments: [
+    { assignmentId: "a1111111-2222-4333-8444-555555555551", workState: "in_progress" },
+    { assignmentId: "a1111111-2222-4333-8444-555555555552", workState: "not_started" },
+  ],
+};
+function zadaci(res, s, put) {
+  if (s.startsWith("e2e-zadaci-403-")) return json(res, 403, { error: "forbidden" });
+  if (s.startsWith("e2e-zadaci-503-")) return json(res, 503, { error: "unavailable" });
+  if (s.startsWith("e2e-zadaci-prazno-")) return json(res, 200, put === "popis" ? { courses: [] } : { assignments: [] });
+  return json(res, 200, put === "popis" ? ZADACI_PUN : RAD_PUN);
+}
+
 const server = createServer(async (req, res) => {
   const url = new URL(req.url, "http://localhost");
   if (url.pathname === "/__zdravlje") return json(res, 200, { ok: true });
   if (!url.pathname.startsWith("/api/v1/")) return json(res, 404, { error: "not_found" });
   const s = sesija(req);
   if (!s) return json(res, 401, { error: "unauthenticated" });
+  if (url.pathname === "/api/v1/student/assignments" && req.method === "GET") return zadaci(res, s, "popis");
+  if (url.pathname === "/api/v1/student/assignment-work" && req.method === "GET") return zadaci(res, s, "rad");
   const docs = dokumenti(s);
   if (url.pathname === "/api/v1/documents" && req.method === "GET") return json(res, 200, [...docs.values()]);
   const m = url.pathname.match(/^\/api\/v1\/documents\/([\w-]+)$/);

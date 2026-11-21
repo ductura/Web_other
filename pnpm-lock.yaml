@@ -175,6 +175,9 @@ importers:
 
   .:
     dependencies:
+      '@ductura/contracts':
+        specifier: https://github.com/ductura/Institution_server/releases/download/contracts-v2.9.1/ductura-contracts-2.9.1.tgz
+        version: https://github.com/ductura/Institution_server/releases/download/contracts-v2.9.1/ductura-contracts-2.9.1.tgz
       next:
         specifier: 16.4.6
         version: 16.4.6(@playwright/test@1.63.0)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -205,6 +208,10 @@ importers:
         version: 5.1.0(@types/node@24.19.2)(vite@8.3.8(@types/node@24.19.2))
 
 packages:
+
+  '@ductura/contracts@https://github.com/ductura/Institution_server/releases/download/contracts-v2.9.1/ductura-contracts-2.9.1.tgz':
+    resolution: {integrity: sha512-jMKagDoTdOl4n5cr8qwqIUocbUI7C/qmHnKNwTBiFCN7UI/SaccvQxrw00BX0l2ZU3hrSdNnFK1pb0SiaauFsw==, tarball: https://github.com/ductura/Institution_server/releases/download/contracts-v2.9.1/ductura-contracts-2.9.1.tgz}
+    version: 2.9.1
 
   '@emnapi/core@2.0.0-beta.2':
     resolution: {integrity: sha512-MzCVoWtcg4Pm2B3je5mMvYMvj3MmBKw+fU7vbsJc9/iT8ip6/eYIHo/Dsm/mr+wsHB6SEyJDuxB09Yy6r/8+4A==}
@@ -950,6 +957,8 @@ packages:
     hasBin: true
 
 snapshots:
+
+  '@ductura/contracts@https://github.com/ductura/Institution_server/releases/download/contracts-v2.9.1/ductura-contracts-2.9.1.tgz': {}
 
   '@emnapi/core@2.0.0-beta.2':
     dependencies:
