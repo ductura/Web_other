@@ -22,6 +22,19 @@ export const hr = {
       error: "Greška pri spremanju. Pokušajte ponovno gumbom Spremi.",
     },
   },
+  zadaci: {
+    naslov: "Moji zadaci",
+    prazno: "Još nemate kolegija ni zadataka.",
+    kolegijBezZadatka: "Za ovaj kolegij nema zadataka.",
+    rok: "Rok",
+    obavijestPrvo: "Prije rada pročitajte obavijest.",
+    nemaPristupa: "Popis zadataka nije dostupan ovom računu.",
+    stanje: {
+      not_started: "Rad nije započet",
+      in_progress: "Rad je u tijeku",
+      submitted: "Rad je predan",
+    },
+  },
   greske: {
     nedostupan: "Poslužitelj trenutačno ne odgovara. Pokušajte ponovno za nekoliko trenutaka.",
     pokusajPonovno: "Pokušaj ponovno",
