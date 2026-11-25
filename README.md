@@ -13,6 +13,10 @@ Frontend za Firefox, Safari, Edge, Operu i ostale preglednike na računalu. Next
 | `/o/` | Moji dokumenti | `GET /api/v1/documents` |
 | `/o/doc/[id]` | naslov, sadržaj, broj riječi, spremanje | `GET /api/v1/documents/{id}` |
 | `PUT /o/api/dokumenti/[id]` | spremanje iz uređivača | `PUT /api/v1/documents/{id}` |
+| `/o/zadaci` | popis zadataka | `GET /api/v1/student/assignments` + `GET /api/v1/student/assignment-work` |
+| `/o/prijavi-problem` | obrazac za prijavu problema | šalje preko `POST /o/api/prijavi-problem` |
+| `POST /o/api/prijavi-problem` | slanje prijave problema (BFF, na poslužitelju) | `POST /api/v1/support/problem-report` |
+| `/o/prijava` | samo preusmjeravanje na prijavu preko AAI@EduHr (`?povratak=`) | `GET /api/v1/auth/login?returnTo=...` |
 
 Stare poveznice `/#/doc/<id>` otvaraju isti dokument.
 
@@ -28,9 +32,10 @@ Opera nema vlastiti Playwright kanal; dijeli Chromium jezgru, a ručno se provje
 pnpm install
 LAZNI_PORT=4000 pnpm fake-server   # bez pravog Institution_servera
 pnpm dev                           # http://localhost:5173/o
+pnpm lint                          # ESLint
 pnpm test                          # vitest: pomoćne funkcije, stranice, ruta spremanja
 pnpm build
-pnpm exec playwright install firefox webkit chromium
+pnpm exec playwright install firefox webkit chromium msedge
 pnpm test:functional
 ```
 

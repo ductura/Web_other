@@ -13,10 +13,10 @@
     "start": "next start -p 5173",
     "build": "next build",
     "test": "vitest run",
-    "test:helpers": "vitest run",
-    "test:functional": "playwright test",
+        "test:functional": "playwright test",
     "fake-server": "node tests/e2e/lazni-server.mjs",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@ductura/contracts": "https://github.com/ductura/Institution_server/releases/download/contracts-v2.9.1/ductura-contracts-2.9.1.tgz",
@@ -29,6 +29,8 @@
     "@types/node": "^24.19.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.4.6",
     "typescript": "5.9.3",
     "vitest": "5.1.0"
   }

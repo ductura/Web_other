@@ -51,8 +51,11 @@ export default function PrijavaProblema({ izvor = null }) {
   useEffect(() => {
     const n = ucitajNacrt();
     if (!n) return;
+    // Nacrt se čita iz sessionStorage tek nakon hidracije (SSR nema pristup), pa se ne može staviti u početno stanje.
+    /* eslint-disable react-hooks/set-state-in-effect */
     setVrsta(n.vrsta);
     setOpis(n.opis);
+    /* eslint-enable react-hooks/set-state-in-effect */
     obrisiNacrt();
   }, []);
 
@@ -75,6 +78,8 @@ export default function PrijavaProblema({ izvor = null }) {
     }
     if (res.status === 401) {
       spremiNacrt({ vrsta, opis });
+      // Puna navigacija: /prijava je route handler (preusmjeravanje na AAI@EduHr), ne stranica Next.js.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
       window.location.assign(`${BASE_PATH}/prijava?povratak=${encodeURIComponent("/prijavi-problem")}`);
       return;
     }
