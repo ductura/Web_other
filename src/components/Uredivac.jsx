@@ -26,6 +26,8 @@ export default function Uredivac({ doc }) {
 
   const save = useMemo(
     () =>
+      // Ref se čita samo u odgođenom pozivu, nikad tijekom renderiranja.
+      // eslint-disable-next-line react-hooks/refs
       debounce(async () => {
         if (spremaSe.current) {
           ceka.current = true;
@@ -63,7 +65,7 @@ export default function Uredivac({ doc }) {
     return () => window.removeEventListener("beforeunload", prijeOdlaska);
   }, [stanje]);
 
-  const promjena = (polje, postavi) => (e) => {
+  const promjena = (polje, postavi, e) => {
     zadnje.current = { ...zadnje.current, [polje]: e.target.value };
     postavi(e.target.value);
     setStanje("dirty");
@@ -72,8 +74,8 @@ export default function Uredivac({ doc }) {
 
   return (
     <>
-      <input id="title" aria-label={t.naslov} value={title} onChange={promjena("title", setTitle)} />
-      <textarea id="editor" aria-label={t.sadrzaj} value={content} onChange={promjena("content", setContent)} />
+      <input id="title" aria-label={t.naslov} value={title} onChange={(e) => promjena("title", setTitle, e)} />
+      <textarea id="editor" aria-label={t.sadrzaj} value={content} onChange={(e) => promjena("content", setContent, e)} />
       <footer className="editor-bar">
         <span id="words">{t.rijeci(wordCount(content))}</span>
         <span id="status" role="status" data-state={stanje}>
