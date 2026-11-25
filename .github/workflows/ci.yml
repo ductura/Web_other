@@ -21,6 +21,11 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 26.13.1
+      - name: Instalacija preglednika (pokretanje u pozadini)
+        run: |
+          version=$(node -p "require('./package.json').devDependencies['@playwright/test']")
+          nohup bash -c "npx -y playwright@$version install --with-deps firefox webkit chromium msedge > \"\$RUNNER_TEMP/pw-install.log\" 2>&1; echo \$? > \"\$RUNNER_TEMP/pw-install.rc\"" > /dev/null 2>&1 &
+          echo "playwright@$version: firefox webkit chromium msedge u pozadini"
       - name: Install pnpm (Node 26 has no corepack)
         run: npm install --global pnpm@12.21.0 && test "$(pnpm --version)" = "12.21.0"
       - run: pnpm install --frozen-lockfile
@@ -31,8 +36,16 @@ jobs:
       - name: Testovi pomoćnih funkcija, stranica i rute
         run: pnpm test
       - run: pnpm build
-      - name: Instalacija preglednika
-        run: pnpm exec playwright install --with-deps firefox webkit chromium msedge
+      # CI-BRZINA: instalacija preglednika (firefox webkit chromium msedge) radi u pozadini od
+      # početka posla, dok traju instalacija paketa, provjere i build; ovdje se
+      # samo čeka njezin kraj. Isti preglednici i isti sistemski paketi, a
+      # neuspjeh instalacije i dalje obara posao.
+      - name: Instalacija preglednika (čekanje)
+        timeout-minutes: 10
+        run: |
+          while [ ! -f "$RUNNER_TEMP/pw-install.rc" ]; do sleep 2; done
+          cat "$RUNNER_TEMP/pw-install.log"
+          exit "$(cat "$RUNNER_TEMP/pw-install.rc")"
       - name: Funkcionalni testovi (Firefox, Safari/WebKit, Edge, Opera/Chromium)
         run: pnpm test:functional
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
