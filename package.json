@@ -1,17 +1,37 @@
 {
   "name": "@ductura/web-other",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Ductura frontend za Firefox, Safari, Edge, Operu i ostale preglednike na računalu",
   "type": "module",
-  "engines": { "node": ">=22" },
+  "packageManager": "pnpm@12.21.0",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
-    "dev": "node dev-server.mjs",
-    "test": "npm run test:helpers && npm run test:functional",
-    "test:helpers": "node --test \"test/unit/*.test.js\"",
-    "test:functional": "playwright test"
+    "dev": "next dev -p 5173",
+    "start": "next start -p 5173",
+    "build": "next build",
+    "test": "vitest run",
+        "test:functional": "playwright test",
+    "fake-server": "node tests/e2e/lazni-server.mjs",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@ductura/contracts": "https://github.com/ductura/Institution_server/releases/download/contracts-v2.9.1/ductura-contracts-2.9.1.tgz",
+    "next": "16.4.6",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
   },
   "devDependencies": {
-    "@playwright/test": "1.63.0"
+    "@playwright/test": "1.63.0",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.4.6",
+    "typescript": "5.9.3",
+    "vitest": "5.1.0"
   }
 }

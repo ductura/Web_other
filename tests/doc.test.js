@@ -1,12 +1,14 @@
-import { test } from 'node:test';
+import { test } from 'vitest';
 import assert from 'node:assert/strict';
-import { debounce, parseRoute, docHref, wordCount, saveStatusLabel, isKeyboardOpen } from '../../public/lib/doc.js';
+import { debounce, parseRoute, docHref, wordCount, saveStatusLabel, isKeyboardOpen } from '../src/lib/doc.js';
 
 test('parseRoute i docHref', () => {
   assert.deepEqual(parseRoute('#/doc/demo-1'), { view: 'doc', id: 'demo-1' });
   assert.deepEqual(parseRoute('#/'), { view: 'list' });
   assert.deepEqual(parseRoute(''), { view: 'list' });
-  assert.deepEqual(parseRoute(docHref('abc')), { view: 'doc', id: 'abc' });
+  assert.deepEqual(parseRoute('#/doc/abc'), { view: 'doc', id: 'abc' });
+  assert.equal(docHref('abc'), '/doc/abc');
+  assert.equal(docHref('a b'), '/doc/a%20b');
 });
 
 test('wordCount', () => {
@@ -15,7 +17,8 @@ test('wordCount', () => {
 });
 
 test('saveStatusLabel', () => {
-  assert.equal(saveStatusLabel('saved'), 'Spremljeno');
+  // PRODUCT §5: „spremljeno” uvijek kaže gdje.
+  assert.equal(saveStatusLabel('saved'), 'Spremljeno na poslužitelju');
   assert.equal(saveStatusLabel('nepoznato'), '');
 });
 
