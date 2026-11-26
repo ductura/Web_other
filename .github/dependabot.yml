@@ -1,0 +1,35 @@
+# Weekly version updates, grouped (DAN-1560); same pattern as ductura/Preloader.
+# Cooldown: a release is proposed only after it has been public for a while, so
+# a hijacked release is usually pulled first. Security updates are not delayed.
+# The actions group also bumps the reusable workflow pins, so those PRs touch
+# .github/** and need the stricter review.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Europe/Zagreb
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: chore
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Europe/Zagreb
+    cooldown:
+      default-days: 7
+      semver-major-days: 30
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+    commit-message:
+      prefix: chore

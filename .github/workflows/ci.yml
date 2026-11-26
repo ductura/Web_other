@@ -39,10 +39,22 @@ jobs:
         if: failure()
         with: { name: playwright-report, path: test-results/ }
 
+  secret-scan:
+    uses: ductura/.github/.github/workflows/secret-scan.yml@f2ad16d2ee7c7694123252ca4d4e8b78366334ee # main, DAN-1526
+
+  dependency-review:
+    # Compares the pull request's dependency changes; needs a pull_request event.
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+    uses: ductura/.github/.github/workflows/dependency-review.yml@f2ad16d2ee7c7694123252ca4d4e8b78366334ee # main, DAN-1526
+
   ci-ok:
-    # Zbirna provjera za zaštitu grana; pada ako `test` nije uspio.
-    if: always()
-    needs: test
-    runs-on: ubuntu-24.04
-    steps:
-      - run: test "${{ needs.test.result }}" = "success"
+    # Aggregate check for branch protection; fails unless every needed job succeeded.
+    if: ${{ always() }}
+    needs: [test, secret-scan, dependency-review]
+    uses: ductura/.github/.github/workflows/ci-ok.yml@f2ad16d2ee7c7694123252ca4d4e8b78366334ee # main, DAN-1526
+    with:
+      results: ${{ toJSON(needs) }}
+      # Skipped on push events, where there is no pull request to review.
+      allow-skipped: dependency-review
